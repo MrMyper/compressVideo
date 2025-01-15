@@ -1,0 +1,32 @@
+import os
+import subprocess
+
+# Путь к папке с исходными видео
+input_folder = r"D:\file\videos"
+# Путь к папке для сжатых видео
+output_folder = r"D:\file\compressed_videos"
+
+# Проверяем, существует ли выходная папка, если нет - создаем
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
+# Проходим по всем видеофайлам в исходной папке
+for filename in os.listdir(input_folder):
+    if filename.endswith(('.mp4', '.avi', '.mov')):  # Вы можете добавить другие форматы
+        input_video = os.path.join(input_folder, filename)
+        output_video = os.path.join(output_folder, f"compressed_{filename}")
+        
+        # Строим команду FFmpeg для сжатия видео с использованием GPU (NVENC)
+        command = [
+            'ffmpeg', '-i', input_video,  # Входной файл
+            '-an',  # Удаляем звук
+            '-vcodec', 'h264_nvenc',  # Используем кодек для NVIDIA NVENC
+            '-preset', 'fast',  # Настроим скорость (можно заменить на 'slow' для лучшего качества)
+            '-crf', '28',  # Качество сжатия (чем выше число, тем больше сжатие)
+            output_video  # Выходной файл
+        ]
+        
+        # Выполняем команду
+        subprocess.run(command)
+
+print("Все видео были успешно сжаты с использованием GPU и очищены от звука.")
